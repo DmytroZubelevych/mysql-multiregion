@@ -9,7 +9,7 @@ var resp = {
   }, {
     nodeType: "proxysql",
     count: 1,
-    cloudlets: ${settings.proxysql_flexibleCloudlets:16},
+    cloudlets: ${settings.proxysql_flexibleCloudlets:8},
     fixedCloudlets: ${settings.proxysql_fixedCloudlets:1},
     nodeGroup: "proxysql"
   }]
