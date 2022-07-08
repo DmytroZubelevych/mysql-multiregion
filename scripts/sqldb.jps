@@ -1,6 +1,6 @@
 type: install
-id: primary-primary-multi
-name: Primary-Primary Multiregion Topology
+id: sqldb-multiregion
+name: DataBase Multiregion Topology
 
 nodes:
   - nodeType: mariadb-dockerized
