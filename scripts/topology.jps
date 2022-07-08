@@ -1,14 +1,31 @@
 type: install
 id: primary-primary-multi
 name: Primary-Primary Multiregion Topology
+
 nodes:
   - nodeType: mariadb-dockerized
     count: 1
     flexibleCloudlets: ${settings.sqldb_flexibleCloudlets:16},
     fixedCloudlets: ${settings.sqldb_fixedCloudlets:1},
     nodeGroup: sqldb
+    env:
+      REPLICA_USER: ${settings.repl_user:repl-test}
+      REPLICA_PSWD: ${settings.repl_pswd:abcABC123}
   - nodeType: proxysql
     count: 1,
     cloudlets: ${settings.proxysql_flexibleCloudlets:8},
     fixedCloudlets: ${settings.proxysql_fixedCloudlets:1},
     nodeGroup: proxysql
+
+mixins:
+  - https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/v2.5.0/scripts/common.yml
+
+globals:
+  PATH: https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/v2.5.0
+  DB_USER: ${settings.DB_USER:user-test}
+  DB_PASS: ${settings.DB_PASS:abcABC123}
+
+onInstall:
+  - getReplicaUser
+  - setupUsers:
+      id: ${nodes.sqldb.naster.id}
