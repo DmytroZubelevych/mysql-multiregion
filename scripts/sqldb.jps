@@ -11,11 +11,6 @@ nodes:
     env:
       REPLICA_USER: ${settings.repl_user:repl-test}
       REPLICA_PSWD: ${settings.repl_pswd:abcABC123}
-  - nodeType: proxysql
-    count: 1,
-    cloudlets: ${settings.proxysql_flexibleCloudlets:8},
-    fixedCloudlets: ${settings.proxysql_fixedCloudlets:1},
-    nodeGroup: proxysql
 
 mixins:
   - https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/v2.5.0/scripts/common.yml
