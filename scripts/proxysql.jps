@@ -1,0 +1,10 @@
+type: install
+id: proxysql-multiregion
+name: ProxySQL Multiregion Topology
+
+nodes:
+  - nodeType: proxysql
+    count: 1,
+    cloudlets: ${settings.proxysql_flexibleCloudlets:8},
+    fixedCloudlets: ${settings.proxysql_fixedCloudlets:1},
+    nodeGroup: proxysql
