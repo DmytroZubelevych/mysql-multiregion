@@ -61,97 +61,13 @@ actions:
             loggerName: "${settings.envName}-" + cluster,
             envGroups: "${globals.envGroups}",
             displayName: "${globals.displayName-" + cluster + "}",
-            region: "${globals.region-" + cluster + "}"
+            region: "${globals.region-" + cluster + "}",
+            settings: {
+              "db_user": "${globals.db_user}",
+              "db_pswd": "${globals.db_pswd}",
+              "repl_user": "${globals.repl_user}",
+              "repl_pswd": "${globals.repl_pswd}"
+            }
           });
         }
         return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
-
-  installAdditionals:
-    - script: |
-        var regions = '${settings.regions}'.split(','), actions = [];
-        for (var cluster = 1, n = regions.length + 1; cluster < n; cluster ++) {
-          actions.push({
-            jps: "/scripts/additionals.jps?_r=${fn.random}",
-            envName: "${settings.envName}-" + cluster,
-          });
-        }
-        return { result: 0, onAfterReturn: { 'install': actions } };
-
-  getEnvNodes:
-    - script: |
-        var regions = '${settings.regions}'.split(','),
-            onAfterReturn = { setGlobals: {} },
-            glbs = onAfterReturn.setGlobals;
-        for (var cluster = 1, n = regions.length + 1; cluster < n; cluster ++) {
-          var resp = jelastic.env.control.GetEnvInfo('${settings.envName}-' + cluster, session);
-          if (resp.result != 0) return resp;
-          for (var i = 0, k = resp.nodes; i < k.length; i++) {
-            if (k[i].nodeGroup == 'cp') 
-              k[i].ismaster ? glbs["master_id_cp-" + cluster] = k[i].id : 0;
-          }
-        }
-        return { result: 0, onAfterReturn: onAfterReturn };
-
-  installReplications:
-    - install:
-      - jps: /scripts/primaryReplicationManager.jps
-        envName: ${settings.envName}-1
-        settings:
-          db_user: ${globals.db_user}
-          db_pass: ${globals.db_pass}
-          repl_user: ${globals.repl_user}
-          repl_pass: ${globals.repl_pass}
-          cluster_name: ${settings.envName}
-      - jps: /scripts/contentSynchronizationManager.jps
-        envName: ${settings.envName}-1
-        settings:
-          sync_pass: ${globals.sync_pass}
-          cluster_name: ${settings.envName}
-
-  installWordpress:
-    - install: ${globals.wp_cluster_path}/scripts/installWP.jps
-      envName: ${settings.envName}-1
-      settings:
-        db_host: 127.0.0.1
-        db_user: ${globals.db_user}
-        db_pass: ${globals.db_pass}
-        wp_admin_pass: ${globals.wp_admin_pass}
-        wp_title: "Hello World"
-        wp_url: ${globals.protocol}://${globals.domain}
-        version_wordpress: ${globals.version_wordpress}
-        cluster: false
-
-  configureLEaddon:
-    install:
-      jps: /scripts/configureLEaddon.jps
-      envName: ${settings.envName}-1
-      settings:
-        domain: ${globals.domain}
-        baseUrl: ${baseUrl}
-        le-addon: ${settings.le-addon:false}
-
-  installCDNaddon:
-    install:
-      jps: https://raw.githubusercontent.com/edgeport/cdn/master/manifest.yml?_r=${fn.random}
-      envName: ${settings.envName}-1
-      skipEmail: true
-      nodeGroup: cp
-      settings:
-        note: ${settings.noteCDN:}
-
-  setProtocol:
-    - script: |
-        return {
-          result:0,
-          ssl: jelastic.billing.account.GetQuotas('environment.jelasticssl.enabled').array[0].value
-        }
-    - if (${response.ssl} || ${settings.le-addon:false}):
-        setGlobals:
-          protocol: https
-
-success:
-  email: /success/email/success-${globals.success}.md?_r=${fn.random}
-  text: /success/text/success-${globals.success}.md?_r=${fn.random}
-
-startPage: ${globals.protocol}://${globals.domain}/
-
