@@ -56,9 +56,9 @@ actions:
         var regions = '${settings.regions}'.split(','), actions = [];
         for (var cluster = 1, n = regions.length + 1; cluster < n; cluster ++) {
           actions.push({
-            jps: "${baseUrl}/scripts/topology.jps?_r=${fn.random}",
-            envName: "${settings.envName}-" + cluster,
-            loggerName: "${settings.envName}-" + cluster,
+            jps: "${baseUrl}/scripts/sqldb.jps?_r=${fn.random}",
+            envName: "${settings.envName}-db-" + cluster,
+            loggerName: "${settings.envName}-db-" + cluster,
             envGroups: "${globals.envGroups}",
             displayName: "${globals.displayName-" + cluster + "}",
             region: "${globals.region-" + cluster + "}",
@@ -68,6 +68,13 @@ actions:
               "repl_user": "${globals.repl_user}",
               "repl_pswd": "${globals.repl_pswd}"
             }
+          }, {
+            jps: "${baseUrl}/scripts/proxysql.jps?_r=${fn.random}",
+            envName: "${settings.envName}-proxysql-" + cluster,
+            loggerName: "${settings.envName}-proxysql-" + cluster,
+            envGroups: "${globals.envGroups}",
+            displayName: "${globals.displayName-" + cluster + "}",
+            region: "${globals.region-" + cluster + "}"         
           });
         }
         return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
