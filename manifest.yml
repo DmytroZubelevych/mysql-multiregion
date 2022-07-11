@@ -24,11 +24,13 @@ settings:
       required: true
 
 globals:
-  db_user: user-${fn.random}
+  db_user: admin-${fn.random}
   db_pswd: ${fn.password(10)}
   repl_user: repl-${fn.random}
   repl_pswd: ${fn.password(10)}
-
+  orch_user: orch-${fn.random}
+  orch_pswd: ${fn.password(10)}
+  
 onInstall:
   - initGlobals
   - createEnvs
@@ -71,11 +73,19 @@ actions:
             }
           }, {
             jps: "${baseUrl}/scripts/proxysql.jps?_r=${fn.random}",
-            envName: "${settings.envName}-proxysql-" + cluster,
-            loggerName: "${settings.envName}-proxysql-" + cluster,
+            envName: "${settings.envName}-lb-" + cluster,
+            loggerName: "${settings.envName}-lb-" + cluster,
             envGroups: "${globals.envGroups}",
             displayName: "${globals.displayName-" + cluster + "}",
-            region: "${globals.region-" + cluster + "}"         
+            region: "${globals.region-" + cluster + "}",
+            settings: {
+              "db_user": "${globals.db_user}",
+              "db_pswd": "${globals.db_pswd}",
+              "repl_user": "${globals.repl_user}",
+              "repl_pswd": "${globals.repl_pswd}",
+              "orch_user": "${globals.orch_user}",
+              "orch_pswd": "${globals.orch_pswd}"
+            }
           });
         }
         return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
@@ -86,6 +96,6 @@ actions:
     - setGlobals:
         DBEnvs: ${response.items.join(,)}
     - script: ${baseUrl}/scripts/getClusterEnvs.js
-      envName: ${settings.envName}-proxysql-1
+      envName: ${settings.envName}-lb-1
     - setGlobals:
         ProxySQLEnvs: ${response.items.join(,)}
