@@ -23,3 +23,32 @@ onInstall:
   - getReplicaUser
   - setupUsers:
       id: ${nodes.sqldb.master.id}
+  - getEnvIndex
+  - if (${response.index} == 1) || (${response.index} == 2): primaryConfiguration
+  - else: secondaryConfiguration
+
+actions:
+  getEnvIndex:
+    - script: |
+        var envNameSeparator = "-", index, tmp;
+        tmp = '${env.envName}'.split(envNameSeparator);
+        index = tmp.pop();
+        if (/\d+/.test(index)) {
+            index = parseInt(index, 10);
+        } else {
+            index = null;
+        }        
+        return { result: 0, index: index };
+        
+  primaryConfiguration:
+    - cmd[${nodes.sqldb.master.id}]: |-
+        wget ${globals.PATH}/configs/master.cnf -O /etc/mysql/conf.d/master.cnf &>> /var/log/run.log;
+        sed -i "s/report_host.*/report_host = node${nodes.sqldb.master.id}/" /etc/mysql/conf.d/master.cnf; 
+        sed -i "s/server-id.*/server-id = ${nodes.sqldb.master.id/" /etc/mysql/conf.d/master.cnf;
+        sed -i "s/auto-increment-offset.*/auto-increment-offset = ${response.index}/" /etc/mysql/conf.d/master.cnf;
+
+  secondaryConfiguration:
+    - cmd[${nodes.sqldb.master.id}]: |-
+        wget ${globals.PATH}/configs/slave.cnf -O /etc/mysql/conf.d/slave.cnf &>> /var/log/run.log;
+        sed -i "s/report_host.*/report_host = node${nodes.sqldb.master.id}/" /etc/mysql/conf.d/slave.cnf;
+        sed -i "s/server-id.*/server-id = ${nodes.sqldb.master.id/" /etc/mysql/conf.d/slave.cnf;
