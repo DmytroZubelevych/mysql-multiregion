@@ -23,4 +23,4 @@ globals:
 onInstall:
   - getReplicaUser
   - setupUsers:
-      id: ${nodes.sqldb.naster.id}
+      id: ${nodes.sqldb.master.id}
