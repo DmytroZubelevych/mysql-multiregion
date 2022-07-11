@@ -5,8 +5,7 @@ name: DataBase Multiregion Topology
 nodes:
   - nodeType: mariadb-dockerized
     count: 1
-    flexibleCloudlets: ${settings.sqldb_flexibleCloudlets:16},
-    fixedCloudlets: ${settings.sqldb_fixedCloudlets:1},
+    flexibleCloudlets: 16
     nodeGroup: sqldb
     env:
       REPLICA_USER: ${settings.repl_user:repl-test}
