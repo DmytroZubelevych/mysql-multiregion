@@ -12,8 +12,8 @@ settings:
       selectFirstAvailable: false
       multiSelect: true
       required: true
-      min: 3
-      max: 3
+      min: 2
+      max: 2
 
     - caption: Environment
       type: envname
@@ -32,6 +32,7 @@ globals:
 onInstall:
   - initGlobals
   - createEnvs
+  - getClusterEnvs
   
 actions:
   initGlobals:
@@ -78,3 +79,13 @@ actions:
           });
         }
         return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
+        
+  getClusterEnvs:
+    - script: ${baseUrl}/scripts/getClusterEnvs.js
+      envName: ${settings.envName}-db-1
+    - setGlobals:
+        DBEnvs: ${response.items.join(,)}
+    - script: ${baseUrl}/scripts/getClusterEnvs.js
+      envName: ${settings.envName}-proxysql-1
+    - setGlobals:
+        ProxySQLEnvs: ${response.items.join(,)}
