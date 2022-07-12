@@ -37,9 +37,10 @@ settings:
       showFullDomain: false
       required: true
       
-    - type: separator
-    
-
+    - type: string
+      name: displayName
+      caption: Display Name
+      default: MariaDB Cluster
 
 globals:
   db_user: admin-${fn.random}
