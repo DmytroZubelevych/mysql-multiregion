@@ -34,7 +34,7 @@ globals:
 onInstall:
   - initGlobals
   - createEnvs
-  - getClusterEnvs
+  - setupGlobals
   
 actions:
   initGlobals:
@@ -89,7 +89,34 @@ actions:
           });
         }
         return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
-        
+
+  setupGlobals:
+    - script: |
+        var regions = '${settings.regions}'.split(','),
+            onAfterReturn = { setGlobals: {} },
+            glbs = onAfterReturn.setGlobals;
+        for (var cluster = 1, n = regions.length + 1; cluster < n; cluster ++) {
+          var resp = jelastic.env.control.GetEnvInfo('${settings.envName}-db-' + cluster, session);
+          if (resp.result != 0) return resp;
+          for (var i = 0, k = resp.nodes; i < k.length; i++) {
+            if (k[i].nodeGroup == 'sqldb') {
+              glbs["dbID-" + cluster] = k[i].id;
+              glbs["dbIP-" + cluster] = k[i].address;
+            }
+          }
+        }
+        for (var cluster = 1, n = regions.length + 1; cluster < n; cluster ++) {
+          var resp = jelastic.env.control.GetEnvInfo('${settings.envName}-lb-' + cluster, session);
+          if (resp.result != 0) return resp;
+          for (var i = 0, k = resp.nodes; i < k.length; i++) {
+            if (k[i].nodeGroup == 'proxysql') {
+              glbs["lbID-" + cluster] = k[i].id;
+              glbs["lbIP-" + cluster] = k[i].address;
+            }
+          }
+        }
+        return { result: 0, onAfterReturn: onAfterReturn };
+
   getClusterEnvs:
     - script: ${baseUrl}/scripts/getClusterEnvs.js
       envName: ${settings.envName}-db-1
