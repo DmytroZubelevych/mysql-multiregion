@@ -12,8 +12,8 @@ settings:
       selectFirstAvailable: false
       multiSelect: true
       required: true
-      min: 2
-      max: 2
+      min: 3
+      max: 3
 
     - caption: Environment
       type: envname
@@ -35,6 +35,8 @@ onInstall:
   - initGlobals
   - createEnvs
   - setupGlobals
+  - getClusterEnvs
+  - setupReplication
   
 actions:
   initGlobals:
@@ -116,6 +118,23 @@ actions:
           }
         }
         return { result: 0, onAfterReturn: onAfterReturn };
+
+  setupReplication:
+    - script: |
+        var DBEnvs = '${globals.DBEnvs}'.split(','), actions = [];
+        for (var i = 0, n = DBEnvs.length; i < n; i ++) {
+          actions.push({
+            jps: "${baseUrl}/scripts/setupReplication.jps?_r=${fn.random}",
+            envName: DBEnvs[i],
+            settings: {
+              "db_user": "${globals.db_user}",
+              "db_pswd": "${globals.db_pswd}",
+              "primary1_id": "${globals.dbID-1}",
+              "primary2_id": "${globals.dbID-2}"
+            }
+          });
+        }
+        return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
 
   getClusterEnvs:
     - script: ${baseUrl}/scripts/getClusterEnvs.js
