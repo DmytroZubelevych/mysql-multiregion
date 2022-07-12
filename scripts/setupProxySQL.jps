@@ -1,0 +1,25 @@
+type: update
+name: ProxySQL
+id: ProxySQL
+baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/main
+
+globals:
+  PRIMARY: ${settings.primary:false}
+  SERVER_IP: ${settings.server_ip:}
+  SERVER_WEIGHT: ${settings.server_ip:}
+  CONFIGURATION: ${settings.configurztion:default}
+
+onInstall:
+  - if ('${globals.PRIMARY}' == 'true'): addPrimary
+  - else: addSecondary
+
+actions:
+  addPrimary:
+    cmd[proxysql]: |-
+      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin -e "INSERT INTO mysql_servers (hostgroup_id, hostname, port,weight) VALUES (10, '${globals.SERVER_IP}', 3306,'${globals.SERVER_WEIGHT}');"
+      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin -e "LOAD MYSQL SERVERS TO RUNTIME; SAVE MYSQL SERVERS TO DISK;"
+  
+  addSecondary:
+    cmd[proxysql]: |-
+      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin -e "INSERT INTO mysql_servers (hostgroup_id, hostname, port,weight) VALUES (11, '${this.slaveIP}', 3306, '${this.weight}');"
+      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin -e "LOAD MYSQL SERVERS TO RUNTIME; SAVE MYSQL SERVERS TO DISK;"
