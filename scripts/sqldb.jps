@@ -7,6 +7,7 @@ nodes:
     count: 1
     flexibleCloudlets: 16
     nodeGroup: sqldb
+    tag: ${settings.tag}
     env:
       REPLICA_USER: ${settings.repl_user:repl-test}
       REPLICA_PSWD: ${settings.repl_pswd:abcABC123}
