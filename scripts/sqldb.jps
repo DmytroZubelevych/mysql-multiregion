@@ -22,8 +22,10 @@ globals:
 onInstall:
   - getReplicaUser
   - getEnvIndex
-  - if (${response.index} == 1) || (${response.index} == 2): 
-      primaryConfiguration: ${response.index}
+  - setGlobals:
+      index: ${response.index}
+  - if (${globals.index} == 1) || (${globals.index} == 2): 
+      primaryConfiguration: ${globals.index}
   - else: secondaryConfiguration
   - setupUsers:
       id: ${nodes.sqldb.master.id}
