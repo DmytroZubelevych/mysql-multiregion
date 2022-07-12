@@ -1,6 +1,10 @@
 type: install
-name: Multi-Region Primary-Primary Cluster
+name: MariaDB Cluster
 id: multiregion-primary-primary-cluster
+description:
+  text: MariaDB cross region cluster of Primary-Primary topology with scalable Secondaries for automatic installation
+        with failover and disaster recovery capabilities.
+  short: CVBCBVCBVCBVCBVCBVCBVC
 baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/main
 
 settings:
@@ -14,6 +18,14 @@ settings:
       required: true
       min: 3
       max: 3
+    
+    - type: dockertags
+      caption: Database version
+      nodeType: mariadb-dockerized
+      name: tag
+      hidden: false    
+
+    - type: separator
 
     - caption: Environment
       type: envname
@@ -22,6 +34,10 @@ settings:
       randomName: true
       showFullDomain: false
       required: true
+      
+    - type: separator
+    
+
 
 globals:
   db_user: admin-${fn.random}
@@ -71,7 +87,8 @@ actions:
               "db_user": "${globals.db_user}",
               "db_pswd": "${globals.db_pswd}",
               "repl_user": "${globals.repl_user}",
-              "repl_pswd": "${globals.repl_pswd}"
+              "repl_pswd": "${globals.repl_pswd}",
+              "tag": "${settings.tag}"
             }
           }, {
             jps: "${baseUrl}/scripts/proxysql.jps?_r=${fn.random}",
