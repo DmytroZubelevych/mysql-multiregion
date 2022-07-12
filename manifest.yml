@@ -4,7 +4,9 @@ id: multiregion-primary-primary-cluster
 description:
   text: MariaDB cross region cluster of Primary-Primary topology with scalable Secondaries for automatic installation
         with failover and disaster recovery capabilities.
-  short: CVBCBVCBVCBVCBVCBVCBVC
+  short: MariaDB cross region cluster of Primary-Primary topology
+logo: /images/mariadb-logo.png
+
 baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/main
 
 settings:
