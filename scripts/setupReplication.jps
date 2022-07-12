@@ -8,8 +8,8 @@ globals:
   PATH: https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/v2.5.0
   DB_USER: ${settings.db_user:user-test}
   DB_PASS: ${settings.db_pswd:abcABC123}
-  PRIMARY1_ID: ${settings.primary1.id:}
-  PRIMARY2_ID: ${settings.primary2.id:}
+  PRIMARY1_ID: ${settings.primary1_id:}
+  PRIMARY2_ID: ${settings.primary2_id:}
   PRIMARY: ${settings.primary:false}
 onInstall:
   - getReplicaUser
