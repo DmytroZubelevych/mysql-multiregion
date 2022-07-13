@@ -6,7 +6,7 @@ baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/main
 globals:
   PRIMARY: ${settings.primary:false}
   SERVER_IP: ${settings.server_ip:}
-  SERVER_WEIGHT: ${settings.server_ip:}
+  SERVER_WEIGHT: ${settings.server_weight:}
   CONFIGURATION: ${settings.configurztion:default}
 
 onInstall:
