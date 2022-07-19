@@ -13,22 +13,14 @@ globals:
   CONFIGURATION: ${settings.configurztion:default}
 
 onInstall:
-  - getEnvIndex
-  - if (${response.index} == 1) || (${response.index} == 2): addPrimary
-  - else: addSecondary
+  - addServer
 
 actions:
-  getEnvIndex:
-    - script: |
-        var envNameSeparator = "-", index, tmp;
-        tmp = '${env.envName}'.split(envNameSeparator);
-        index = tmp.pop();
-        if (/\d+/.test(index)) {
-            index = parseInt(index, 10);
-        } else {
-            index = null;
-        }        
-        return { result: 0, index: index };
+  addServer:
+    cmd[proxysql]: |-
+      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin -e "INSERT INTO mysql_servers (hostgroup_id, hostname, port,weight) VALUES (10, '${globals.WRITE_SERVER_IP}', 3306,'${globals.WRITE_SERVER_WEIGHT}');"
+      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin -e "INSERT INTO mysql_servers (hostgroup_id, hostname, port,weight) VALUES (11, '${globals.READ_SERVER_IP', 3306, '${globals.READ_SERVER_WEIGHT');"
+      MYSQL_PWD=admin mysql -h 127.0.0.1 -P6032 -uadmin -e "LOAD MYSQL SERVERS TO RUNTIME; SAVE MYSQL SERVERS TO DISK;"
 
   addPrimary:
     cmd[proxysql]: |-
