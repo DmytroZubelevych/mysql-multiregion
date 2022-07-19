@@ -10,4 +10,4 @@ globals:
   CONFIGURATION: ${settings.configurztion:default}
 
 onInstall:
-  - log: ------ ${globals.SERVER_IP}-------
+  - log: ------ ${env.envName}-------
