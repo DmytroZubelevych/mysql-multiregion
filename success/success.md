@@ -1,9 +1,9 @@
 Use the following credentials:   
 
-Database access 
+Database access   
 **User**: ${globals.db_user}  
 **Password**: ${globals.db_pswd}  
 
-ProxySQL access 
+ProxySQL access   
 **User**: ${globals.db_user}  
 **Password**: ${globals.db_pswd}  
