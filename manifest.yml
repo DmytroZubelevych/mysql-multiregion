@@ -1,4 +1,4 @@
-type: install
+type: update
 name: MariaDB Cluster
 id: multiregion-primary-primary-cluster
 description:
@@ -9,40 +9,9 @@ logo: /images/mariadb-logo.png
 
 baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/main
 
-settings:
-  fields:
-    - caption: Regions
-      type: regionlist
-      name: regions
-      disableInactive: true
-      selectFirstAvailable: false
-      multiSelect: true
-      required: true
-      min: 3
-      max: 3
-    
-    - type: dockertags
-      caption: Database version
-      nodeType: mariadb-dockerized
-      name: tag
-      hidden: false    
-
-    - type: separator
-
-    - caption: Environment
-      type: envname
-      name: envName
-      dependsOn: region
-      randomName: true
-      showFullDomain: false
-      required: true
-      
-    - type: string
-      name: displayName
-      caption: Display Name
-      default: MariaDB Cluster
 
 globals:
+  envName: env-7894887
   db_user: admin-${fn.random}
   db_pswd: ${fn.password(10)}
   repl_user: repl-${fn.random}
@@ -51,11 +20,8 @@ globals:
   orch_pswd: ${fn.password(10)}
   
 onInstall:
-  - initGlobals
-  - createEnvs
-  - setupGlobals
   - getClusterEnvs
-  - setupReplication
+  - setupBalancing
   
 actions:
   initGlobals:
@@ -155,13 +121,55 @@ actions:
           });
         }
         return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
+  
+  setupBalancing:
+    - script: |
+        var ProxySQLEnvs = '${globals.ProxySQLEnvs}'.split(','), actions = [], index;
+        for (var i = 0, n = ProxySQLEnvs.length; i < n; i ++) {
+          if (/lb-1/.test(ProxySQLEnvs[i])) {
+            actions.push({
+              jps: "${baseUrl}/scripts/test.jps?_r=${fn.random}",
+              envName: ProxySQLEnvs[i],
+              settings: {
+                "primary": "true",
+                "write_server_ip-1": "${globals.dbIP-1}",
+                "write_server_ip-2": "${globals.dbIP-2}",
+                "read_server_ip": "${globals.dbIP-1}"
+              }
+            });
+          }
+          if (/lb-2/.test(ProxySQLEnvs[i])) {
+            actions.push({
+              jps: "${baseUrl}/scripts/test.jps?_r=${fn.random}",
+              envName: ProxySQLEnvs[i],
+              settings: {
+                "primary": "true",
+                "write_server_ip-1": "${globals.dbIP-1}",
+                "write_server_ip-2": "${globals.dbIP-2}",
+                "read_server_ip": "${globals.dbIP-2}"
+              }
+            });
+          }
+          if (/lb-3/.test(ProxySQLEnvs[i])) {
+            actions.push({
+              jps: "${baseUrl}/scripts/test.jps?_r=${fn.random}",
+              envName: ProxySQLEnvs[i],
+              settings: {
+                "primary": "false",
+                "write_server_ip-1": "${globals.dbIP-3}",
+                "read_server_ip": "${globals.dbIP-3}"
+              }
+            });
+          }
+        }
+        return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
 
   getClusterEnvs:
     - script: ${baseUrl}/scripts/getClusterEnvs.js
-      envName: ${settings.envName}-db-1
+      envName: ${globals.envName}-db-1
     - setGlobals:
         DBEnvs: ${response.items.join(,)}
     - script: ${baseUrl}/scripts/getClusterEnvs.js
-      envName: ${settings.envName}-lb-1
+      envName: ${globals.envName}-lb-1
     - setGlobals:
         ProxySQLEnvs: ${response.items.join(,)}
