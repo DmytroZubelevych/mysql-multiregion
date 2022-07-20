@@ -55,6 +55,7 @@ onInstall:
   - createEnvs
   - setupGlobals
   - getClusterEnvs
+  - attachNodeGroups
   - setupReplication
   - setupBalancing
   
@@ -208,9 +209,41 @@ actions:
       envName: ${settings.envName}-lb-1
     - setGlobals:
         ProxySQLEnvs: ${response.items.join(,)}
+  
+  attachNodeGroups:
+    - script: |
+        var databaseEnvGroup = 'Database cluster ' + '${settings.envName}';
+        var targetEnvGroups = eval('(' + MANIFEST + ')').envGroups;
+        if (!Array.isArray(targetEnvGroups)) {
+            targetEnvGroupsString = targetEnvGroups.toString();
+            targetEnvGroups = [];
+            if(targetEnvGroupsString.length != 0) {
+                targetEnvGroups.push(targetEnvGroupsString);
+            }
+        }
+        targetEnvGroups.push(databaseEnvGroup);
+        var DBEnvs = '${globals.DBEnvs}'.split(',');
+        var ProxySQLEnvs = '${globals.ProxySQLEnvs}'.split(',');
+        for (var i = 0, n = DBEnvs.length; i < n; i ++) {
+            resp = jelastic.env.control.AttachEnvGroup({
+              envName    : DBEnvs[i],
+              session  : session,
+              envGroups: targetEnvGroups
+            });
+            if (resp.result != 0) { return resp; }
+        }
+        for (var i = 0, n = ProxySQLEnvs.length; i < n; i ++) {
+            resp = jelastic.env.control.AttachEnvGroup({
+              envName    : ProxySQLEnvs[i],
+              session  : session,
+              envGroups: targetEnvGroups
+            });
+            if (resp.result != 0) { return resp; }
+        }
+        return { result: 0 }
 
 success: 
   email: true
   text: |
-    **User**: ${globals.db_user}
+    **User**: ${globals.db_user}		
     **Password**: ${globals.db_pswd}
