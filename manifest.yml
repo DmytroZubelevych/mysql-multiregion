@@ -163,7 +163,7 @@ actions:
         for (var i = 0, n = ProxySQLEnvs.length; i < n; i ++) {
           if (/lb-1/.test(ProxySQLEnvs[i])) {
             actions.push({
-              jps: "${baseUrl}/scripts/setupProxySQL?_r=${fn.random}",
+              jps: "${baseUrl}/scripts/setupProxySQL.jps?_r=${fn.random}",
               envName: ProxySQLEnvs[i],
               settings: {
                 "primary": "true",
@@ -175,7 +175,7 @@ actions:
           }
           if (/lb-2/.test(ProxySQLEnvs[i])) {
             actions.push({
-              jps: "${baseUrl}/scripts/test.jps?_r=${fn.random}",
+              jps: "${baseUrl}/scripts/setupProxySQL.jps?_r=${fn.random}",
               envName: ProxySQLEnvs[i],
               settings: {
                 "primary": "true",
@@ -187,7 +187,7 @@ actions:
           }
           if (/lb-3/.test(ProxySQLEnvs[i])) {
             actions.push({
-              jps: "${baseUrl}/scripts/test.jps?_r=${fn.random}",
+              jps: "${baseUrl}/scripts/setupProxySQL.jps?_r=${fn.random}",
               envName: ProxySQLEnvs[i],
               settings: {
                 "primary": "false",
