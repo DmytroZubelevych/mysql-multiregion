@@ -40,6 +40,8 @@ onBeforeAddNode[proxysql]:
     message: Scaling is not supported for multiregion cluster.
 
 onInstall:
+  - api: env.control.SetEnvDisplayName
+    displayName: ${env.envName} ProxySQL ${env.region}
   - getReplicaUser
   - setupOrchestrator
   - setupProxySQL
