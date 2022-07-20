@@ -230,3 +230,9 @@ actions:
             if (resp.result != 0) { return resp; }
         }
         return { result: 0 }
+
+success: 
+  email: true
+  text: |
+    **User**: ${globals.db_user}
+    **Password**: ${globals.db_pswd}
