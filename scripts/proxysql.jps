@@ -19,6 +19,26 @@ globals:
   ORCH_USER: ${settings.orch_user:orch-test}
   ORCH_PASS: ${settings.orch_pswd:abcABC123}
 
+onBeforeClone:
+  stopEvent:
+    type: warning
+    message: Cloning is not supported for multiregion cluster. 
+
+onBeforeMigrate:
+  stopEvent:
+    type: warning
+    message: Migration is not supported for multiregion cluster.
+
+onBeforeRemoveNode[proxysql]:
+  stopEvent:
+    type: warning
+    message: Scaling is not supported for multiregion cluster.
+
+onBeforeAddNode[proxysql]:
+  stopEvent:
+    type: warning
+    message: Scaling is not supported for multiregion cluster.
+
 onInstall:
   - getReplicaUser
   - setupOrchestrator
