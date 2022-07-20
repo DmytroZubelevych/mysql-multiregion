@@ -231,8 +231,6 @@ actions:
         }
         return { result: 0 }
 
-success: 
-  email: true
-  text: |
-    **User**: ${globals.db_user}    
-    **Password**: ${globals.db_pswd}
+success:
+  email: /success/success.md?_r=${fn.random}
+  text: /success/success.md?_r=${fn.random}
