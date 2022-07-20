@@ -234,5 +234,5 @@ actions:
 success: 
   email: true
   text: |
-    **User**: ${globals.db_user}
+    **User**: ${globals.db_user}    
     **Password**: ${globals.db_pswd}
