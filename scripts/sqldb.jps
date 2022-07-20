@@ -46,9 +46,14 @@ onInstall:
   - getEnvIndex
   - setGlobals:
       index: ${response.index}
-  - if (${globals.index} == 1) || (${globals.index} == 2): 
-      primaryConfiguration: ${globals.index}
-  - else: secondaryConfiguration
+  - if (${globals.index} == 1) || (${globals.index} == 2):
+    - api: env.control.SetEnvDisplayName
+      displayName: ${env.envName} Primary-${globals.index} ${env.region}
+    - primaryConfiguration: ${globals.index}
+  - else: 
+    - api: env.control.SetEnvDisplayName
+      displayName: ${env.envName} Secondary ${env.region}  
+    - secondaryConfiguration
   - setupUsers:
       id: ${nodes.sqldb.master.id}
 
@@ -79,4 +84,3 @@ actions:
         sed -i "s/report_host.*/report_host = node${nodes.sqldb.master.id}/" /etc/mysql/conf.d/slave.cnf;
         sed -i "s/server-id.*/server-id = ${nodes.sqldb.master.id}/" /etc/mysql/conf.d/slave.cnf;
         sed -i '/log-slave-updates/d' /etc/mysql/conf.d/slave.cnf
-
