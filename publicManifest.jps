@@ -18,8 +18,8 @@ settings:
       selectFirstAvailable: false
       multiSelect: true
       required: true
-      min: 3
-      max: 3
+      min: 2
+      max: 5
     
     - type: dockertags
       caption: Database version
@@ -55,6 +55,7 @@ onInstall:
   - createEnvs
   - setupGlobals
   - getClusterEnvs
+  - attachNodeGroups
   - setupReplication
   - setupBalancing
   
@@ -85,7 +86,7 @@ actions:
             envName: "${settings.envName}-db-" + cluster,
             loggerName: "${settings.envName}-db-" + cluster,
             envGroups: "${globals.envGroups}",
-            displayName: "${globals.displayName-" + cluster + "}",
+            displayName: "${settings.envName}-db-" + cluster,
             region: "${globals.region-" + cluster + "}",
             settings: {
               "db_user": "${globals.db_user}",
@@ -99,7 +100,7 @@ actions:
             envName: "${settings.envName}-lb-" + cluster,
             loggerName: "${settings.envName}-lb-" + cluster,
             envGroups: "${globals.envGroups}",
-            displayName: "${globals.displayName-" + cluster + "}",
+            displayName: "${settings.envName}-lb-" + cluster,
             region: "${globals.region-" + cluster + "}",
             settings: {
               "db_user": "${globals.db_user}",
@@ -159,45 +160,34 @@ actions:
 
   setupBalancing:
     - script: |
-        var ProxySQLEnvs = '${globals.ProxySQLEnvs}'.split(','), actions = [], index;
+        var ProxySQLEnvs = '${globals.ProxySQLEnvs}'.split(','), actions = [], envNameSeparator = "-", index, tmp;
         for (var i = 0, n = ProxySQLEnvs.length; i < n; i ++) {
-          if (/lb-1/.test(ProxySQLEnvs[i])) {
-            actions.push({
-              jps: "${baseUrl}/scripts/setupProxySQL.jps?_r=${fn.random}",
-              envName: ProxySQLEnvs[i],
-              settings: {
-                "primary": "true",
-                "write_server_ip-1": "${globals.dbIP-1}",
-                "write_server_ip-2": "${globals.dbIP-2}",
-                "read_server_ip": "${globals.dbIP-1}"
-              }
-            });
-          }
-          if (/lb-2/.test(ProxySQLEnvs[i])) {
-            actions.push({
-              jps: "${baseUrl}/scripts/setupProxySQL.jps?_r=${fn.random}",
-              envName: ProxySQLEnvs[i],
-              settings: {
-                "primary": "true",
-                "write_server_ip-1": "${globals.dbIP-1}",
-                "write_server_ip-2": "${globals.dbIP-2}",
-                "read_server_ip": "${globals.dbIP-2}"
-              }
-            });
-          }
-          if (/lb-3/.test(ProxySQLEnvs[i])) {
-            actions.push({
-              jps: "${baseUrl}/scripts/setupProxySQL.jps?_r=${fn.random}",
-              envName: ProxySQLEnvs[i],
-              settings: {
-                "primary": "false",
-                "write_server_ip-1": "${globals.dbIP-3}",
-                "read_server_ip": "${globals.dbIP-3}"
-              }
-            });
-          }
+          tmp = ProxySQLEnvs[i].split(envNameSeparator);
+          index = tmp.pop();          
+          index = /\d+/.test(index) ? parseInt(index, 10) : null;          
+          actions.push({
+            jps: "${baseUrl}/scripts/setupProxySQL.jps?_r=${fn.random}",
+            envName: ProxySQLEnvs[i],
+            settings: {
+              "primary": "true",
+              "write_server_ip-1": "${globals.dbIP-1}",
+              "write_server_ip-2": "${globals.dbIP-2}",
+              "read_server_ip": "${globals.dbIP-" + index + "}"
+            }
+          });
         }
         return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
+
+        var envNameSeparator = "-", index, tmp;
+        tmp = '${env.envName}'.split(envNameSeparator);
+        index = tmp.pop();
+        if (/\d+/.test(index)) {
+            index = parseInt(index, 10);
+        } else {
+            index = null;
+        }        
+
+
 
   getClusterEnvs:
     - script: ${baseUrl}/scripts/getClusterEnvs.js
@@ -208,3 +198,35 @@ actions:
       envName: ${settings.envName}-lb-1
     - setGlobals:
         ProxySQLEnvs: ${response.items.join(,)}
+
+  attachNodeGroups:
+    - script: |
+        var databaseEnvGroup = 'Database cluster ' + '${settings.envName}';
+        var targetEnvGroups = eval('(' + MANIFEST + ')').envGroups;
+        if (!Array.isArray(targetEnvGroups)) {
+            targetEnvGroupsString = targetEnvGroups.toString();
+            targetEnvGroups = [];
+            if(targetEnvGroupsString.length != 0) {
+                targetEnvGroups.push(targetEnvGroupsString);
+            }
+        }
+        targetEnvGroups.push(databaseEnvGroup);
+        var DBEnvs = '${globals.DBEnvs}'.split(',');
+        var ProxySQLEnvs = '${globals.ProxySQLEnvs}'.split(',');
+        for (var i = 0, n = DBEnvs.length; i < n; i ++) {
+            resp = jelastic.env.control.AttachEnvGroup({
+              envName    : DBEnvs[i],
+              session  : session,
+              envGroups: targetEnvGroups
+            });
+            if (resp.result != 0) { return resp; }
+        }
+        for (var i = 0, n = ProxySQLEnvs.length; i < n; i ++) {
+            resp = jelastic.env.control.AttachEnvGroup({
+              envName    : ProxySQLEnvs[i],
+              session  : session,
+              envGroups: targetEnvGroups
+            });
+            if (resp.result != 0) { return resp; }
+        }
+        return { result: 0 }
