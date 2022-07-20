@@ -16,6 +16,26 @@ nodes:
 mixins:
   - https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/v2.5.0/scripts/common.yml
 
+onBeforeClone:
+  stopEvent:
+    type: warning
+    message: Cloning is not supported for multiregion cluster. 
+
+onBeforeMigrate:
+  stopEvent:
+    type: warning
+    message: Migration is not supported for multiregion cluster.
+
+onBeforeRemoveNode[sqldb]:
+  stopEvent:
+    type: warning
+    message: Scaling is not supported for multiregion cluster.
+
+onBeforeAddNode[sqldb]:
+  stopEvent:
+    type: warning
+    message: Scaling is not supported for multiregion cluster.
+
 globals:
   PATH: https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/v2.5.0
   DB_USER: ${settings.db_user:user-test}
