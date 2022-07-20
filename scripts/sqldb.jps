@@ -83,4 +83,5 @@ actions:
         wget ${globals.PATH}/configs/slave.cnf -O /etc/mysql/conf.d/slave.cnf &>> /var/log/run.log;
         sed -i "s/report_host.*/report_host = node${nodes.sqldb.master.id}/" /etc/mysql/conf.d/slave.cnf;
         sed -i "s/server-id.*/server-id = ${nodes.sqldb.master.id}/" /etc/mysql/conf.d/slave.cnf;
-        sed -i '/log-slave-updates/d' /etc/mysql/conf.d/slave.cnf
+        sed -i '/log-slave-updates/d' /etc/mysql/conf.d/slave.cnf;
+        sed -i '/read_only.*/d' /etc/mysql/conf.d/slave.cnf;
