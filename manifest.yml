@@ -208,3 +208,9 @@ actions:
       envName: ${settings.envName}-lb-1
     - setGlobals:
         ProxySQLEnvs: ${response.items.join(,)}
+
+success: 
+  email: true
+  text: |
+    **User**: ${globals.db_user}
+    **Password**: ${globals.db_pswd}
