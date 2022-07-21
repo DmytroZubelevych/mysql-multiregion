@@ -170,7 +170,8 @@ actions:
                 "primary": "true",
                 "write_server_ip-1": "${globals.dbIP-1}",
                 "write_server_ip-2": "${globals.dbIP-2}",
-                "read_server_ip": "${globals.dbIP-1}"
+                "read_server_ip-1": "${globals.dbIP-1}",
+                "read_server_ip-2": "${globals.dbIP-2}",
               }
             });
           }
@@ -182,7 +183,8 @@ actions:
                 "primary": "true",
                 "write_server_ip-1": "${globals.dbIP-1}",
                 "write_server_ip-2": "${globals.dbIP-2}",
-                "read_server_ip": "${globals.dbIP-2}"
+                "read_server_ip-1": "${globals.dbIP-2}",
+                "read_server_ip-2": "${globals.dbIP-1}"
               }
             });
           }
