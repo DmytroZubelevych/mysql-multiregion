@@ -195,7 +195,7 @@ actions:
               settings: {
                 "primary": "false",
                 "write_server_ip-1": "${globals.dbIP-3}",
-                "read_server_ip": "${globals.dbIP-3}"
+                "read_server_ip-1": "${globals.dbIP-3}"
               }
             });
           }
