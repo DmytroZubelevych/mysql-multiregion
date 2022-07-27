@@ -95,7 +95,10 @@ actions:
               "repl_pswd": "${globals.repl_pswd}",
               "tag": "${settings.tag}"
             }
-          }, {
+          });
+        }  
+        for (var cluster = 1, n = regions.length; cluster < n; cluster ++) {
+          actions.push({
             jps: "${baseUrl}/scripts/proxysql.jps?_r=${fn.random}",
             envName: "${settings.envName}-lb-" + cluster,
             loggerName: "${settings.envName}-lb-" + cluster,
@@ -186,17 +189,6 @@ actions:
                 "write_server_ip-2": "${globals.dbIP-2}",
                 "read_server_ip-1": "${globals.dbIP-2}",
                 "read_server_ip-2": "${globals.dbIP-1}"
-              }
-            });
-          }
-          if (/lb-3/.test(ProxySQLEnvs[i])) {
-            actions.push({
-              jps: "${baseUrl}/scripts/setupProxySQL.jps?_r=${fn.random}",
-              envName: ProxySQLEnvs[i],
-              settings: {
-                "primary": "false",
-                "write_server_ip-1": "${globals.dbIP-3}",
-                "read_server_ip-1": "${globals.dbIP-3}"
               }
             });
           }
