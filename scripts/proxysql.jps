@@ -18,7 +18,7 @@ globals:
   DB_PASS: ${settings.db_pswd:abcABC123}
   ORCH_USER: ${settings.orch_user:orch-test}
   ORCH_PASS: ${settings.orch_pswd:abcABC123}
-  vpnAppid: ${settings.vpnAppid:1234567890}
+  vpnAppid: ${settings.vpnAppid}
 
 onBeforeClone:
   stopEvent:
@@ -46,7 +46,7 @@ onInstall:
   - getReplicaUser
   - setupOrchestrator
   - setupProxySQL
-  - if ('${globals.vpnAppid}' != '1234567890'):
+  - if (!/vpnAppid/.test("${globals.vpnAppid}")):
     - installAddon:
         id: internal_network
         nodeGroup: proxysql
