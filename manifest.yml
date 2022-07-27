@@ -93,7 +93,8 @@ actions:
               "db_pswd": "${globals.db_pswd}",
               "repl_user": "${globals.repl_user}",
               "repl_pswd": "${globals.repl_pswd}",
-              "tag": "${settings.tag}"
+              "tag": "${settings.tag}",
+              "vpnAppid": "${globals.vpnAppid}"
             }
           });
         }  
@@ -133,7 +134,7 @@ actions:
             }
           }
         }
-        for (var cluster = 1, n = regions.length + 1; cluster < n; cluster ++) {
+        for (var cluster = 1, n = regions.length; cluster < n; cluster ++) {
           var resp = jelastic.env.control.GetEnvInfo('${settings.envName}-lb-' + cluster, session);
           if (resp.result != 0) return resp;
           for (var i = 0, k = resp.nodes; i < k.length; i++) {
