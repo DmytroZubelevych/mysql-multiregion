@@ -2,6 +2,7 @@ type: install
 id: proxysql-multiregion
 name: ProxySQL Multiregion Topology
 
+skipNodeEmails: true
 nodes:
   - nodeType: proxysql
     count: 1
