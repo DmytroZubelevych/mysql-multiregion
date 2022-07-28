@@ -61,7 +61,67 @@ onInstall:
           nodeGroup: sqldb
   - setupUsers:
       id: ${nodes.sqldb.master.id}
-  
+
+addons:
+  - id: internal_network
+    name: Internal Network Add-on
+    settings:
+      mainAppid: 36e23b2951e1884b53e97eb6e68ae50c
+    onBeforeDelete:
+      callScript:
+        action: DeleteEnv
+
+    onBeforeRemoveNode:
+      callScript:
+        action: RemoveNode
+        nodeId: ${event.params.nodeid}
+
+    onAfterAddNode:
+      callScript:
+        action: AddNode
+        nodeId: ${event.response.node.id}
+
+    onAfterClone:
+      - script: delete MANIFEST.id; return {result:0, jps:MANIFEST};
+      - install: ${response.jps}
+        envName: ${event.response.env.envName}
+          
+
+    onAfterCloneNodes:
+      forEach(node:event.response.array):
+        callScript:
+          action: AddNode
+          nodeId: ${@node.id}
+
+    onBeforeMigrate:
+      callScript:
+        action: MigrateEnvCheck
+        hostGroup: ${event.params.hardwareNodeGroup}
+
+      if(${globals.NEED_DETACH}):
+        callScript:
+          action: DeleteEnv
+
+    onAfterMigrate:
+      callScript:
+        action: CreateEnv
+
+
+    onInstall:
+      callScript:
+        action: CreateEnv
+
+    actions:
+      callScript:
+        - script: |-
+            appId = '${this.appid:0}'
+            if(appId == 0) appId = '${env.appid}';
+            hostGroup = '${this.hostGroup:0}'
+            if(hostGroup == 0) hostGroup = '${env.hostGroup.uniqueName}';
+            var params = { envAppid: appId, action: "${this.action}", nodeId:"${this.nodeId:0}", hostGroup: hostGroup }, 
+                resp = jelastic.dev.scripting.Eval("${globals.vpnAppid}", session, "vpn.VPNController", params);
+            return resp.response ? resp.response:resp;
+
 actions:
   getEnvIndex:
     - script: |
