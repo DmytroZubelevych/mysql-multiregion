@@ -1,0 +1,25 @@
+type: install
+id: proxysql-multiregion
+name: ProxySQL Multiregion Topology
+
+nodes:
+  - nodeType: proxysql
+    count: 1
+    cloudlets: 8
+    nodeGroup: proxysql
+    skipNodeEmails: true
+    env:
+      REPLICA_USER: ${settings.repl_user:repl-test}
+      REPLICA_PSWD: ${settings.repl_pswd:abcABC123}
+
+globals:
+  PATH: https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/v2.5.0
+  DB_USER: ${settings.db_user:user-test}
+  DB_PASS: ${settings.db_pswd:abcABC123}
+  ORCH_USER: ${settings.orch_user:orch-test}
+  ORCH_PASS: ${settings.orch_pswd:abcABC123}
+  vpnAppid: ${settings.vpnAppid}
+
+onInstall:
+  - api: env.control.SetEnvDisplayName
+    displayName: ${env.envName} ProxySQL ${env.region}
