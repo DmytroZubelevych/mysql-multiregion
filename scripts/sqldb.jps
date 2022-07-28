@@ -40,6 +40,7 @@ globals:
   PATH: https://raw.githubusercontent.com/jelastic-jps/mysql-cluster/v2.5.0
   DB_USER: ${settings.db_user:user-test}
   DB_PASS: ${settings.db_pswd:abcABC123}
+  vpnAppid: ${settings.vpnAppid}
 
 onInstall:
   - getReplicaUser
@@ -54,9 +55,13 @@ onInstall:
     - api: env.control.SetEnvDisplayName
       displayName: ${env.envName} Secondary ${env.region}  
     - secondaryConfiguration
+    - if (!/vpnAppid/.test("${globals.vpnAppid}")):
+      - installAddon:
+          id: internal_network
+          nodeGroup: sqldb
   - setupUsers:
       id: ${nodes.sqldb.master.id}
-
+  
 actions:
   getEnvIndex:
     - script: |
