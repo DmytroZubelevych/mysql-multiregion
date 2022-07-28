@@ -49,7 +49,6 @@ globals:
   repl_pswd: ${fn.password(10)}
   orch_user: orch-${fn.random}
   orch_pswd: ${fn.password(10)}
-  vpnAppid: 36e23b2951e1884b53e97eb6e68ae50c
   
 onInstall:
   - initGlobals
