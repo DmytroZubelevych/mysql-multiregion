@@ -178,17 +178,6 @@ actions:
         }
         return { result: 0, onAfterReturn: { 'marketplace.jps.install': actions } };
 
-        var envNameSeparator = "-", index, tmp;
-        tmp = '${env.envName}'.split(envNameSeparator);
-        index = tmp.pop();
-        if (/\d+/.test(index)) {
-            index = parseInt(index, 10);
-        } else {
-            index = null;
-        }        
-
-
-
   getClusterEnvs:
     - script: ${baseUrl}/scripts/getClusterEnvs.js
       envName: ${settings.envName}-db-1
