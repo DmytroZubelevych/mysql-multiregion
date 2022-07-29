@@ -42,7 +42,7 @@ onBeforeAddNode[proxysql]:
 
 onInstall:
   - api: env.control.SetEnvDisplayName
-    displayName: ${env.envName} ProxySQL ${env.region}
+    displayName: ${env.envName} ProxySQL ${env.hostGroup.displayName}
   - getReplicaUser
   - setupOrchestrator
   - setupProxySQL
