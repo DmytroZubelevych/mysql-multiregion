@@ -49,11 +49,11 @@ onInstall:
       index: ${response.index}
   - if (${globals.index} == 1) || (${globals.index} == 2):
     - api: env.control.SetEnvDisplayName
-      displayName: ${env.envName} Primary-${globals.index} ${env.region}
+      displayName: ${env.envName} Primary-${globals.index} ${env.hostGroup.displayName}
     - primaryConfiguration: ${globals.index}
   - else: 
     - api: env.control.SetEnvDisplayName
-      displayName: ${env.envName} Secondary ${env.region}  
+      displayName: ${env.envName} Secondary ${env.hostGroup.displayName}
     - secondaryConfiguration
     - if (!/vpnAppid/.test("${globals.vpnAppid}")):
       - installAddon:
