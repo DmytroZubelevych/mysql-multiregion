@@ -1,5 +1,5 @@
 type: install
-name: MariaDB Cluster
+name: MariaDB Multi-Region Cluster
 id: multiregion-primary-primary-cluster
 description:
   text: A MariaDB cluster that can be deployed across several regions with Primary-Primary-Secondary replication topology and automatic failover capabilities.
