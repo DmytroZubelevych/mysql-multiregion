@@ -1,9 +1,9 @@
 Multi-Region MariaDB Database cluster ${settings.envName} successfully installed.
 
 Entry point details:    
-**Primary**: ${globals.primaryRegion} ${globals.primaryExtIP}   
-**Standby**: ${globals.standbyRegion} ${globals.standbyExtIP}   
-**DR**: ${globals.drRegion} ${globals.drExtIP}   
+**Primary**: ${globals.regionName-1} ${globals.extIP-1}   
+**Standby**: ${globals.regionName-2} ${globals.extIP-2}   
+**DR**: ${globals.regionName-3} ${globals.extIP-3}   
 
 Use the following credentials:   
 **User**: ${globals.db_user}  
