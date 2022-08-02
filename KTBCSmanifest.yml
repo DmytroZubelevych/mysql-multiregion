@@ -2,10 +2,9 @@ type: install
 name: MariaDB Cluster
 id: multiregion-primary-primary-cluster
 description:
-  text: MariaDB cross region cluster of Primary-Primary topology with scalable Secondaries for automatic installation
-        with failover and disaster recovery capabilities.
-  short: MariaDB cross region cluster of Primary-Primary topology
-logo: /images/mariadb-logo.png
+  text: A MariaDB cluster that can be deployed across several regions with Primary-Primary-Secondary replication topology and automatic failover capabilities.
+  short: MariaDB Multi-Region cluster of Primary-Primary topology
+logo: /images/mariadb-multi-logo.png
 
 baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/main
 
