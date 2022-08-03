@@ -3,6 +3,6 @@ name: Deleting environment
 description: Deleting environment
 
 onInstall:
-  - api: env.control.env.control.DeleteEnv
+  - api: env.control.DeleteEnv
     envName: ${env.envName}
     password: ${settings.password}
