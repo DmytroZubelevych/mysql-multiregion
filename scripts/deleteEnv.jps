@@ -1,0 +1,8 @@
+type: install
+name: Deleting environment
+description: Deleting environment
+
+onInstall:
+  - api: env.control.env.control.DeleteEnv
+    envName: ${env.envName}
+    password: ${settings.password}
