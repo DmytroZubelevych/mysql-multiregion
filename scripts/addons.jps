@@ -17,11 +17,44 @@ addons:
     
     buttons:
       - caption: Delete Cluster
-        action: delete-cluster
+        action: deleteClusterEnvs
         loadingText: Deleting...
         confirmText: Do you want to delete Multi-Region Cluster?
         successText:  Multi-Region Cluster have been successfully deleted!                
     
-actions:
-  delete-cluster:
-    
+  getClusterEnvs:
+    - script: ${baseUrl}/scripts/getClusterEnvs.js
+      envName: ${globals.clusterEvnName}-db-1
+    - setGlobals:
+        DBEnvs: ${response.items.join(,)}
+    - script: ${baseUrl}/scripts/getClusterEnvs.js
+      envName: ${globals.clusterEvnName}-lb-1
+    - setGlobals:
+        ProxySQLEnvs: ${response.items.join(,)}
+
+  deleteClusterEnvs:
+    - script: |
+        var clusterEvnName = '${env.envName}',
+        clusterEvnName = clusterEvnName.split(/\-lb-|-db-/).shift();
+        return { result: 0, onAfterReturn: { setGlobals: {"clusterEvnName": clusterEvnName} } };
+    - getClusterEnvs
+    - script: |
+        var DBEnvs = '${globals.DBEnvs}'.split(','),
+            ProxySQLEnvs = '${globals.ProxySQLEnvs}'.split(','), install = [];
+        for (var i = 0, n = DBEnvs.length; i < n; i ++) {
+          install.push({
+            jps: "${baseUrl}/scripts/deleteEnv.jps?_r=${fn.random}",
+            envName: DBEnvs[i],
+            settings: {
+              "password": "${settings.password}",
+          });
+        }
+        for (var i = 0, n = ProxySQLEnvs.length; i < n; i ++) {
+          install.push({
+            jps: "${baseUrl}/scripts/deleteEnv.jps?_r=${fn.random}",
+            envName: ProxySQLEnvs[i],
+            settings: {
+              "password": "${settings.password}",
+          });
+        }
+        return { result: 0, onAfterReturn: { install: install } }
