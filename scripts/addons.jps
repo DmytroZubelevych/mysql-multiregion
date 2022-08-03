@@ -14,7 +14,15 @@ addons:
     name: Multi-Region Cluster Deletion
     description: Deletes all the environments that compose a multi-region cluster and the environment group to which they belong.
     logo: https://raw.githubusercontent.com/sych74/mysql-multiregion/main/images/delete-multi-mariadb.png
-    
+
+    settings:
+      fields:
+        - type: string
+          inputType: password
+          caption: Password
+          name: password
+          required: true
+
     buttons:
       - caption: Delete Cluster
         action: deleteClusterEnvs
