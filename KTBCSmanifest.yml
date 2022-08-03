@@ -6,7 +6,7 @@ description:
   short: MariaDB Multi-Region cluster of Primary-Primary topology
 logo: /images/mariadb-multi-logo.png
 
-baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/main
+baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/addon
 
 settings:
   fields:
