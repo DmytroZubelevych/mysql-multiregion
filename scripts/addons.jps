@@ -51,7 +51,7 @@ addons:
             ProxySQLEnvs = '${globals.ProxySQLEnvs}'.split(','), install = [];
         for (var i = 0, n = DBEnvs.length; i < n; i ++) {
           install.push({
-            jps: "${baseUrl}/scripts/deleteEnv.jps?_r=${fn.random}",
+            jps: "https://raw.githubusercontent.com/sych74/mysql-multiregion/addon/scripts/deleteEnv.jps?_r=${fn.random}",
             envName: DBEnvs[i],
             settings: {
               "password": "${settings.password}",
@@ -59,7 +59,7 @@ addons:
         }
         for (var i = 0, n = ProxySQLEnvs.length; i < n; i ++) {
           install.push({
-            jps: "${baseUrl}/scripts/deleteEnv.jps?_r=${fn.random}",
+            jps: "https://raw.githubusercontent.com/sych74/mysql-multiregion/addon/scripts/deleteEnv.jps?_r=${fn.random}",
             envName: ProxySQLEnvs[i],
             settings: {
               "password": "${settings.password}",
