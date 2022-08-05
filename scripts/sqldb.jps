@@ -56,11 +56,10 @@ onInstall:
       displayName: ${env.envName} Secondary ${env.hostGroup.displayName}
     - secondaryConfiguration
     - if (!/vpnAppid/.test("${globals.vpnAppid}")):
-      - install: 
-          jps: /vpnNetwork.jps
-          nodeGroup: sqldb
-          settings:
-            mainAppid: ${globals.vpnAppid}
+      - install: /vpnNetwork.jps
+        nodeGroup: sqldb
+        settings:
+          vpnAppid: ${globals.vpnAppid}
   - setupUsers:
       id: ${nodes.sqldb.master.id}
 
