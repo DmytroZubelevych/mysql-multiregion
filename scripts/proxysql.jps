@@ -47,11 +47,10 @@ onInstall:
   - setupOrchestrator
   - setupProxySQL
   - if (!/vpnAppid/.test("${globals.vpnAppid}")):
-    - install: 
-        jps: /vpnNetwork.jps
-        nodeGroup: proxysql
-        settings:
-          mainAppid: ${globals.vpnAppid}
+    - install: /vpnNetwork.jps
+      nodeGroup: proxysql
+      settings:
+        vpnAppid: ${globals.vpnAppid}
 
 actions:
   getReplicaUser:
