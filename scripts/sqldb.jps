@@ -57,7 +57,7 @@ onInstall:
     - secondaryConfiguration
     - if (!/vpnAppid/.test("${globals.vpnAppid}")):
       - install: 
-          jps: /scripts/vpnNetwork.jps
+          jps: /vpnNetwork.jps
           nodeGroup: sqldb
           settings:
             mainAppid: ${globals.vpnAppid}
