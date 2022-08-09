@@ -61,7 +61,6 @@ onInstall:
   - createEnvs
   - setupGlobals
   - getClusterEnvs
-  - attachNodeGroups
   - setupReplication
   - setupBalancing
   
@@ -91,7 +90,7 @@ actions:
             jps: "${baseUrl}/scripts/sqldb.jps?_r=${fn.random}",
             envName: "${settings.envName}-db-" + cluster,
             loggerName: "${settings.envName}-db-" + cluster,
-            envGroups: "${globals.envGroups}",
+            envGroups: "Database cluster ${settings.envName}",
             displayName: "${globals.displayName-" + cluster + "}",
             region: "${globals.region-" + cluster + "}",
             settings: {
@@ -109,7 +108,7 @@ actions:
             jps: "${baseUrl}/scripts/proxysql.jps?_r=${fn.random}",
             envName: "${settings.envName}-lb-" + cluster,
             loggerName: "${settings.envName}-lb-" + cluster,
-            envGroups: "${globals.envGroups}",
+            envGroups: "Database cluster ${settings.envName}",
             displayName: "${globals.displayName-" + cluster + "}",
             region: "${globals.region-" + cluster + "}",
             settings: {
@@ -198,38 +197,6 @@ actions:
     - setGlobals:
         ProxySQLEnvs: ${response.items.join(,)}
   
-  attachNodeGroups:
-    - script: |
-        var databaseEnvGroup = 'Database cluster ' + '${settings.envName}';
-        var targetEnvGroups = eval('(' + MANIFEST + ')').envGroups;
-        if (!Array.isArray(targetEnvGroups)) {
-            targetEnvGroupsString = targetEnvGroups.toString();
-            targetEnvGroups = [];
-            if(targetEnvGroupsString.length != 0) {
-                targetEnvGroups.push(targetEnvGroupsString);
-            }
-        }
-        targetEnvGroups.push(databaseEnvGroup);
-        var DBEnvs = '${globals.DBEnvs}'.split(',');
-        var ProxySQLEnvs = '${globals.ProxySQLEnvs}'.split(',');
-        for (var i = 0, n = DBEnvs.length; i < n; i ++) {
-            resp = jelastic.env.control.AttachEnvGroup({
-              envName    : DBEnvs[i],
-              session  : session,
-              envGroups: targetEnvGroups
-            });
-            if (resp.result != 0) { return resp; }
-        }
-        for (var i = 0, n = ProxySQLEnvs.length; i < n; i ++) {
-            resp = jelastic.env.control.AttachEnvGroup({
-              envName    : ProxySQLEnvs[i],
-              session  : session,
-              envGroups: targetEnvGroups
-            });
-            if (resp.result != 0) { return resp; }
-        }
-        return { result: 0 }
-
 success:
   email: /success/KTBCSsuccess.md?_r=${fn.random}
   text: /success/KTBCSsuccess.md?_r=${fn.random}
