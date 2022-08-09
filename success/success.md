@@ -2,8 +2,8 @@ Multi-Region MariaDB Database cluster **${settings.envName}** successfully insta
 
 
 ### Entry point details:    
-${settings.envName}-lb-1.${globals.domain-1}:3306   
-${settings.envName}-lb-2.${globals.domain-2}:3306   
+node${globals.lbID-1}-${settings.envName}-lb-1.${globals.domain-1}:3306   
+node${globals.lbID-2}-${settings.envName}-lb-2.${globals.domain-2}:3306   
 
 ### Database credentials:   
 **Username**: ${globals.db_user}  
