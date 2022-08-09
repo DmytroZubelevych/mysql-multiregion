@@ -1,5 +1,6 @@
 Multi-Region MariaDB Database cluster **${settings.envName}** successfully installed.
 
+
 ### Entry point details:    
 ${settings.envName}-lb-1.${globals.domain-1}:3306   
 ${settings.envName}-lb-2.${globals.domain-2}:3306   
@@ -7,6 +8,7 @@ ${settings.envName}-lb-2.${globals.domain-2}:3306
 ### Database credentials:   
 **Username**: ${globals.db_user}  
 **Password**: ${globals.db_pswd}  
+
 ___
 
 The instructions below can help you with the further managing your database cluster:
