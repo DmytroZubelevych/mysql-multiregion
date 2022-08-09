@@ -1,8 +1,8 @@
 Multi-Region MariaDB Database cluster **${settings.envName}** successfully installed.
 
 ### Entry point details:    
-**Region ${globals.regionName-1}**: ${globals.extIP-1}   
-**Region ${globals.regionName-2}**: ${globals.extIP-1}   
+${settings.envName}-lb-1.${globals.domain-1}:3306   
+${settings.envName}-lb-2.${globals.domain-2}:3306   
 
 ### Database credentials:   
 **Username**: ${globals.db_user}  
