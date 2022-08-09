@@ -12,7 +12,7 @@ categories:
   - apps/popular
   - apps/clusters
 
-baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/group
+baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/main
 
 settings:
   fields:
@@ -90,7 +90,7 @@ actions:
             jps: "${baseUrl}/scripts/sqldb.jps?_r=${fn.random}",
             envName: "${settings.envName}-db-" + cluster,
             loggerName: "${settings.envName}-db-" + cluster,
-            envGroups: "${globals.envGroups}",
+            envGroups: "Database cluster ${settings.envName}",
             displayName: "${globals.displayName-" + cluster + "}",
             region: "${globals.region-" + cluster + "}",
             settings: {
@@ -108,7 +108,7 @@ actions:
             jps: "${baseUrl}/scripts/proxysql.jps?_r=${fn.random}",
             envName: "${settings.envName}-lb-" + cluster,
             loggerName: "${settings.envName}-lb-" + cluster,
-            envGroups: "${globals.envGroups}",
+            envGroups: "Database cluster ${settings.envName}",
             displayName: "${globals.displayName-" + cluster + "}",
             region: "${globals.region-" + cluster + "}",
             settings: {
