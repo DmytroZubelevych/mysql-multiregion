@@ -58,6 +58,8 @@ globals:
   
 onInstall:
   - initGlobals
+  - env.group.CreateGroup:
+      envGroup: "Database cluster ${settings.envName}"
   - createEnvs
   - setupGlobals
   - getClusterEnvs
@@ -68,7 +70,6 @@ actions:
   initGlobals:
     - script: |
         var regions = '${settings.regions}'.split(','), index, resp,
-            envGroups = eval('(' + MANIFEST + ')').envGroups,
             onAfterReturn = { setGlobals: {} }, 
             glbs = onAfterReturn.setGlobals;
         resp = jelastic.env.control.GetRegions(appid, session);
@@ -79,7 +80,6 @@ actions:
           glbs["region-" + index] = regions[i];
           glbs["displayName-" + index] = "Cluster " + index;          
         }
-        glbs["envGroups"] = envGroups;
         return { result: 0, onAfterReturn: onAfterReturn };
 
   createEnvs:
