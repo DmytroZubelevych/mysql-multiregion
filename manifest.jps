@@ -1,11 +1,16 @@
 type: install
-name: MariaDB Cluster
+name: MariaDB Multi-Region Cluster
 id: multiregion-primary-primary-cluster
+jpsVersion: '1.5.2'
 description:
-  text: MariaDB cross region cluster of Primary-Primary topology with scalable Secondaries for automatic installation
-        with failover and disaster recovery capabilities.
-  short: MariaDB cross region cluster of Primary-Primary topology
-logo: /images/mariadb-logo.png
+  text: A MariaDB cluster that can be deployed across several regions with Primary-Primary-Secondary replication topology and automatic failover capabilities.
+  short: MariaDB Multi-Region cluster of Primary-Primary topology
+logo: /images/mariadb-multi-logo.png
+
+categories:
+  - apps/clustered-dbs
+  - apps/popular
+  - apps/clusters
 
 baseUrl: https://raw.githubusercontent.com/sych74/mysql-multiregion/main
 
@@ -19,7 +24,7 @@ settings:
       multiSelect: true
       required: true
       min: 2
-      max: 5
+      max: 3
     
     - type: dockertags
       caption: Database version
@@ -86,21 +91,25 @@ actions:
             envName: "${settings.envName}-db-" + cluster,
             loggerName: "${settings.envName}-db-" + cluster,
             envGroups: "${globals.envGroups}",
-            displayName: "${settings.envName}-db-" + cluster,
+            displayName: "${globals.displayName-" + cluster + "}",
             region: "${globals.region-" + cluster + "}",
             settings: {
               "db_user": "${globals.db_user}",
               "db_pswd": "${globals.db_pswd}",
               "repl_user": "${globals.repl_user}",
               "repl_pswd": "${globals.repl_pswd}",
-              "tag": "${settings.tag}"
+              "tag": "${settings.tag}",
+              "vpnAppid": "${globals.vpnAppid}"
             }
-          }, {
+          });
+        }  
+        for (var cluster = 1, n = 2; cluster <= n; cluster ++) {
+          actions.push({
             jps: "${baseUrl}/scripts/proxysql.jps?_r=${fn.random}",
             envName: "${settings.envName}-lb-" + cluster,
             loggerName: "${settings.envName}-lb-" + cluster,
             envGroups: "${globals.envGroups}",
-            displayName: "${settings.envName}-lb-" + cluster,
+            displayName: "${globals.displayName-" + cluster + "}",
             region: "${globals.region-" + cluster + "}",
             settings: {
               "db_user": "${globals.db_user}",
@@ -108,7 +117,8 @@ actions:
               "repl_user": "${globals.repl_user}",
               "repl_pswd": "${globals.repl_pswd}",
               "orch_user": "${globals.orch_user}",
-              "orch_pswd": "${globals.orch_pswd}"
+              "orch_pswd": "${globals.orch_pswd}",
+              "vpnAppid": "${globals.vpnAppid}"
             }
           });
         }
@@ -122,22 +132,14 @@ actions:
         for (var cluster = 1, n = regions.length + 1; cluster < n; cluster ++) {
           var resp = jelastic.env.control.GetEnvInfo('${settings.envName}-db-' + cluster, session);
           if (resp.result != 0) return resp;
-          for (var i = 0, k = resp.nodes; i < k.length; i++) {
-            if (k[i].nodeGroup == 'sqldb') {
-              glbs["dbID-" + cluster] = k[i].id;
-              glbs["dbIP-" + cluster] = k[i].address;
-            }
-          }
+          glbs["dbID-" + cluster] = resp.nodes[0].id;
+          glbs["dbIP-" + cluster] = resp.nodes[0].address;
         }
-        for (var cluster = 1, n = regions.length + 1; cluster < n; cluster ++) {
+        for (var cluster = 1, n = regions.length; cluster < n; cluster ++) {
           var resp = jelastic.env.control.GetEnvInfo('${settings.envName}-lb-' + cluster, session);
           if (resp.result != 0) return resp;
-          for (var i = 0, k = resp.nodes; i < k.length; i++) {
-            if (k[i].nodeGroup == 'proxysql') {
-              glbs["lbID-" + cluster] = k[i].id;
-              glbs["lbIP-" + cluster] = k[i].address;
-            }
-          }
+          glbs["lbID-" + cluster] = resp.nodes[0].id;
+          glbs["lbIP-" + cluster] = resp.nodes[0].address;
         }
         return { result: 0, onAfterReturn: onAfterReturn };
 
@@ -160,11 +162,8 @@ actions:
 
   setupBalancing:
     - script: |
-        var ProxySQLEnvs = '${globals.ProxySQLEnvs}'.split(','), actions = [], envNameSeparator = "-", index, tmp;
+        var ProxySQLEnvs = '${globals.ProxySQLEnvs}'.split(','), actions = [], index;
         for (var i = 0, n = ProxySQLEnvs.length; i < n; i ++) {
-          tmp = ProxySQLEnvs[i].split(envNameSeparator);
-          index = tmp.pop();          
-          index = /\d+/.test(index) ? parseInt(index, 10) : null;          
           actions.push({
             jps: "${baseUrl}/scripts/setupProxySQL.jps?_r=${fn.random}",
             envName: ProxySQLEnvs[i],
@@ -172,7 +171,8 @@ actions:
               "primary": "true",
               "write_server_ip-1": "${globals.dbIP-1}",
               "write_server_ip-2": "${globals.dbIP-2}",
-              "read_server_ip": "${globals.dbIP-" + index + "}"
+              "read_server_ip-1": "${globals.dbIP-1}",
+              "read_server_ip-2": "${globals.dbIP-2}",
             }
           });
         }
@@ -187,7 +187,7 @@ actions:
       envName: ${settings.envName}-lb-1
     - setGlobals:
         ProxySQLEnvs: ${response.items.join(,)}
-
+  
   attachNodeGroups:
     - script: |
         var databaseEnvGroup = 'Database cluster ' + '${settings.envName}';
@@ -221,5 +221,5 @@ actions:
         return { result: 0 }
 
 success:
-  email: /success/success.md?_r=${fn.random}
-  text: /success/success.md?_r=${fn.random}
+  email: /success/KTBCSsuccess.md?_r=${fn.random}
+  text: /success/KTBCSsuccess.md?_r=${fn.random}
