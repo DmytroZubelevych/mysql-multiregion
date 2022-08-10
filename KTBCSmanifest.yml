@@ -23,7 +23,7 @@ settings:
       selectFirstAvailable: false
       multiSelect: true
       required: true
-      min: 3
+      min: 2
       max: 3
     
     - type: dockertags
@@ -78,8 +78,8 @@ actions:
         for (var i = 0, n = regions.length; i < n; i ++) {
           index = i + 1;
           glbs["region-" + index] = regions[i];
-          glbs["displayName-" + index] = "Cluster " + index;          
         }
+        glbs["regionNumber"] = regions.length;
         return { result: 0, onAfterReturn: onAfterReturn };
 
   createEnvs:
@@ -91,7 +91,6 @@ actions:
             envName: "${settings.envName}-db-" + cluster,
             loggerName: "${settings.envName}-db-" + cluster,
             envGroups: "Database cluster ${settings.envName}",
-            displayName: "${globals.displayName-" + cluster + "}",
             region: "${globals.region-" + cluster + "}",
             settings: {
               "db_user": "${globals.db_user}",
@@ -103,13 +102,12 @@ actions:
             }
           });
         }  
-        for (var cluster = 1, n = regions.length; cluster < n; cluster ++) {
+        for (var cluster = 1, n = 2; cluster <= n; cluster ++) {
           actions.push({
             jps: "${baseUrl}/scripts/proxysql.jps?_r=${fn.random}",
             envName: "${settings.envName}-lb-" + cluster,
             loggerName: "${settings.envName}-lb-" + cluster,
             envGroups: "Database cluster ${settings.envName}",
-            displayName: "${globals.displayName-" + cluster + "}",
             region: "${globals.region-" + cluster + "}",
             settings: {
               "db_user": "${globals.db_user}",
@@ -140,7 +138,7 @@ actions:
             glbs["extIP-" + cluster] = resp.nodes[0].displayName.match(reg);;
           }
         }
-        for (var cluster = 1, n = regions.length; cluster < n; cluster ++) {
+        for (var cluster = 1, n = 2; cluster <= n; cluster ++) {
           var resp = jelastic.env.control.GetEnvInfo('${settings.envName}-lb-' + cluster, session);
           if (resp.result != 0) return resp;
           glbs["lbID-" + cluster] = resp.nodes[0].id;
@@ -198,5 +196,5 @@ actions:
         ProxySQLEnvs: ${response.items.join(,)}
   
 success:
-  email: /success/KTBCSsuccess.md?_r=${fn.random}
-  text: /success/KTBCSsuccess.md?_r=${fn.random}
+  email: /success/${globals.regionNumber}-KTBCSsuccess.md?_r=${fn.random}
+  text: /success/${globals.regionNumber}-KTBCSsuccess.md?_r=${fn.random}
