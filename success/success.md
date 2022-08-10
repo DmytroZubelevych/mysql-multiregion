@@ -18,4 +18,3 @@ The instructions below can help you with the further managing your database clus
 - [Adjust vertical scaling settings](https://docs.jelastic.com/automatic-vertical-scaling)
 - [Monitor the statistics](https://docs.jelastic.com/view-app-statistics) & [view log files](https://docs.jelastic.com/view-log-files)
 - [Access environment via SSH](https://docs.jelastic.com/ssh-access)
-- [DNS Hostnames for Direct Connection](https://jelastic.com/blog/dns-hostnames-for-direct-container-connection-at-jelastic-paas/)
