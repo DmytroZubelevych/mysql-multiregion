@@ -139,7 +139,7 @@ actions:
           glbs["dbID-" + cluster] = resp.nodes[0].id;
           glbs["dbIP-" + cluster] = resp.nodes[0].address;
         }
-        for (var cluster = 1, n = regions.length; cluster < n; cluster ++) {
+        for (var cluster = 1, n = 2; cluster <= n; cluster ++) {
           var resp = jelastic.env.control.GetEnvInfo('${settings.envName}-lb-' + cluster, session);
           if (resp.result != 0) return resp;
           glbs["lbID-" + cluster] = resp.nodes[0].id;
